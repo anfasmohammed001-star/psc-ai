@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI-Powered Kerala PSC Parallel Question Generator. Upload PDF exam papers and automatically generate concept-matched practice papers.">
+    <title>Kerala PSC Exam Prep AI — Parallel Practice Generator</title>
+    <!-- Outfit & Noto Sans Malayalam Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="background-glow"></div>
+    <div class="container">
+        <header>
+            <div class="logo">PSC AI</div>
+            <h1>Kerala PSC Exam Prep AI</h1>
+            <p class="subtitle">Generate concept-matched parallel practice papers in Malayalam & English using Gemini Multimodal Vision API</p>
+        </header>
+
+        <main>
+            <div class="card glass">
+                <form id="upload-form">
+                    <div class="form-group">
+                        <label for="language-select">Target Paper Language</label>
+                        <select id="language-select" name="language">
+                            <option value="Malayalam">Malayalam (Skips first 2 instruction pages)</option>
+                            <option value="English">English</option>
+                        </select>
+                    </div>
+
+                    <div class="dropzone" id="dropzone">
+                        <input type="file" id="file-input" name="file" accept=".pdf" style="display: none;">
+                        <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        </svg>
+                        <p class="dropzone-text">Drag and drop your PSC Question PDF here or <span>browse files</span></p>
+                        <p class="dropzone-hint">Supported format: PDF (Max size: 50MB)</p>
+                    </div>
+                    <div id="file-info" class="file-info" style="display: none;">
+                        <span class="file-name" id="selected-file-name">Selected_Paper.pdf</span>
+                        <button type="button" class="btn-clear" id="btn-clear-file">Remove</button>
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="btn-generate-questions">
+                        <span>Generate Practice Guide</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Job Execution Panel -->
+            <div class="card glass pipeline-card" id="pipeline-panel" style="display: none;">
+                <h2>AI Pipeline Status</h2>
+                
+                <div class="pipeline-progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-bar-fill" style="width: 0%;"></div>
+                    </div>
+                    <div class="progress-stats">
+                        <span id="pages-ratio">Pages: 0/0</span>
+                        <span id="status-badge" class="badge badge-pending">PENDING</span>
+                    </div>
+                </div>
+
+                <div class="console-log">
+                    <div class="console-header">
+                        <span>System logs</span>
+                        <span class="dot-indicator pulsing"></span>
+                    </div>
+                    <div class="console-body" id="console-output">
+                        <div class="console-line text-info">System ready. Awaiting PDF upload...</div>
+                    </div>
+                </div>
+
+                <div class="actions-panel" id="completed-actions" style="display: none;">
+                    <a href="#" id="btn-download-pdf" class="btn-download" target="_blank">
+                        <svg class="download-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        Download Parallel Study Guide PDF
+                    </a>
+                </div>
+            </div>
+
+            <!-- Job History Panel -->
+            <div class="card glass history-card" id="history-panel">
+                <h2>Job Generation History</h2>
+                <div class="history-list" id="history-list">
+                    <p class="no-history">Loading history...</p>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2026 Kerala PSC Prep AI Capstone. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <!-- Frontend logic for file uploading and status polling -->
+    <script>
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('file-input');
+        const fileInfo = document.getElementById('file-info');
+        const selectedFileName = document.getElementById('selected-file-name');
+        const btnClearFile = document.getElementById('btn-clear-file');
+        const uploadForm = document.getElementById('upload-form');
+        const btnGenerate = document.getElementById('btn-generate-questions');
+        const pipelinePanel = document.getElementById('pipeline-panel');
+        const progressBarFill = document.getElementById('progress-bar-fill');
+        const pagesRatio = document.getElementById('pages-ratio');
+        const statusBadge = document.getElementById('status-badge');
+        const consoleOutput = document.getElementById('console-output');
+        const completedActions = document.getElementById('completed-actions');
+        const btnDownloadPdf = document.getElementById('btn-download-pdf');
+
+        let pollingInterval = null;
+
+        // Dropzone interactions
+        dropzone.addEventListener('click', () => fileInput.click());
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('dragover');
+        });
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                updateFileInfo();
+            }
+        });
+
+        fileInput.addEventListener('change', updateFileInfo);
+        btnClearFile.addEventListener('click', (e) => {
+            e.stopPropagation();
+            fileInput.value = '';
+            updateFileInfo();
+        });
+
+        function updateFileInfo() {
+            if (fileInput.files.length) {
+                selectedFileName.textContent = fileInput.files[0].name;
+                fileInfo.style.display = 'flex';
+                dropzone.style.display = 'none';
+            } else {
+                fileInfo.style.display = 'none';
+                dropzone.style.display = 'flex';
+            }
+        }
+
+        // Logger Helper
+        function logToConsole(message, type = 'info') {
+            const line = document.createElement('div');
+            line.className = `console-line text-${type}`;
+            const time = new Date().toLocaleTimeString();
+            line.innerHTML = `<span class="console-timestamp">[${time}]</span> ${message}`;
+            consoleOutput.appendChild(line);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+
+        // Form Submit
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!fileInput.files.length) {
+                alert('Please select a PDF file first.');
+                return;
+            }
+
+            // Reset UI for processing
+            pipelinePanel.style.display = 'block';
+            completedActions.style.display = 'none';
+            progressBarFill.style.style = '0%';
+            pagesRatio.textContent = 'Pages: 0/0';
+            statusBadge.className = 'badge badge-pending';
+            statusBadge.textContent = 'PENDING';
+            consoleOutput.innerHTML = '';
+            logToConsole('Uploading PDF to Flask server...');
+
+            const formData = new FormData(uploadForm);
+            btnGenerate.disabled = true;
+
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || 'Server upload failed');
+                }
+
+                logToConsole(`File uploaded successfully. Job enqueued with ID: ${data.job_id}`);
+                startPolling(data.job_id);
+
+            } catch (err) {
+                logToConsole(`Upload failed: ${err.message}`, 'error');
+                statusBadge.className = 'badge badge-failed';
+                statusBadge.textContent = 'FAILED';
+                btnGenerate.disabled = false;
+            }
+        });
+
+        function startPolling(jobId) {
+            if (pollingInterval) clearInterval(pollingInterval);
+            
+            pollingInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(`/api/status/${jobId}`);
+                    const data = await response.json();
+                    
+                    if (!response.ok) throw new Error(data.error || 'Failed to poll status');
+
+                    // Update UI elements
+                    statusBadge.textContent = data.status;
+                    statusBadge.className = `badge badge-${data.status.toLowerCase()}`;
+                    pagesRatio.textContent = `Pages: ${data.pages_processed}/${data.total_pages}`;
+                    
+                    if (data.total_pages > 0) {
+                        const percent = Math.min((data.pages_processed / data.total_pages) * 100, 100);
+                        progressBarFill.style.width = `${percent}%`;
+                    }
+                    
+                    if (data.current_stage) {
+                        // Log stage changes
+                        const lastLine = consoleOutput.lastElementChild;
+                        if (!lastLine || !lastLine.innerHTML.includes(data.current_stage)) {
+                            logToConsole(data.current_stage, data.status === 'FAILED' ? 'error' : 'info');
+                        }
+                    }
+
+                    if (data.status === 'COMPLETED') {
+                        clearInterval(pollingInterval);
+                        logToConsole('PDF Parallel Question Paper generation complete!', 'success');
+                        btnDownloadPdf.href = `/api/download/${jobId}`;
+                        completedActions.style.display = 'block';
+                        btnGenerate.disabled = false;
+                        loadHistory(); // Refresh history panel
+                    } else if (data.status === 'FAILED') {
+                        clearInterval(pollingInterval);
+                        logToConsole(`Job execution failed: ${data.error_message}`, 'error');
+                        btnGenerate.disabled = false;
+                        loadHistory(); // Refresh history panel
+                    }
+
+                } catch (err) {
+                    logToConsole(`Polling error: ${err.message}`, 'error');
+                    clearInterval(pollingInterval);
+                    btnGenerate.disabled = false;
+                }
+            }, 2500);
+        }
+
+        const historyList = document.getElementById('history-list');
+
+        async function loadHistory() {
+            try {
+                const response = await fetch('/api/jobs');
+                if (!response.ok) throw new Error('Failed to load history');
+                const jobs = await response.json();
+                
+                if (jobs.length === 0) {
+                    historyList.innerHTML = '<p class="no-history">No past jobs found.</p>';
+                    return;
+                }
+                
+                historyList.innerHTML = jobs.map(job => {
+                    const date = new Date(job.created_at).toLocaleString();
+                    const statusClass = `badge-${job.status.toLowerCase()}`;
+                    const downloadBtn = job.status === 'COMPLETED' 
+                        ? `<a href="/api/download/${job.job_id}" class="history-download-link">Download PDF</a>` 
+                        : '';
+                    return `
+                        <div class="history-item">
+                            <div class="history-item-meta">
+                                <span class="history-date">${date}</span>
+                                <span class="badge ${statusClass}">${job.status}</span>
+                            </div>
+                            <div class="history-item-details">
+                                <span>Pages processed: ${job.pages_processed}/${job.total_pages}</span>
+                                ${downloadBtn}
+                            </div>
+                            ${job.error_message ? `<div class="history-error">${job.error_message}</div>` : ''}
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                historyList.innerHTML = `<p class="no-history text-error">Error loading history: ${err.message}</p>`;
+            }
+        }
+
+        // Initialize history list on DOM load
+        document.addEventListener('DOMContentLoaded', loadHistory);
+    </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    volumes:
+      # Mount directories to keep uploaded files, output study guides, and the database persistent on the host
+      - ./uploads:/app/uploads
+      - ./outputs:/app/outputs
+      - ./flask_app/psc_jobs.db:/app/flask_app/psc_jobs.db
+    restart: unless-stopped

@@ -1,0 +1,505 @@
+/* 
+CSS Styling for Kerala PSC Exam Prep AI Dashboard.
+Implements modern aesthetics, glassmorphism, and responsive design.
+*/
+
+:root {
+    --bg-primary: #0a0b10;
+    --card-bg: rgba(255, 255, 255, 0.05);
+    --card-border: rgba(255, 255, 255, 0.1);
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    
+    /* Elegant Harmonious Gradients */
+    --primary-grad: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+    --bg-grad: radial-gradient(circle at 50% 50%, #1e1b4b 0%, #030712 100%);
+    
+    --success-color: #22c55e;
+    --warning-color: #f59e0b;
+    --error-color: #ef4444;
+    --info-color: #3b82f6;
+    
+    --font-outfit: 'Outfit', sans-serif;
+    --font-malayalam: 'Noto Sans Malayalam', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--bg-primary);
+    background-image: var(--bg-grad);
+    font-family: var(--font-outfit);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Background decorative glowing orbs */
+.background-glow {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(0,0,0,0) 70%);
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+    padding: 40px 20px;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo {
+    display: inline-block;
+    padding: 6px 16px;
+    background: var(--primary-grad);
+    border-radius: 50px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+}
+
+h1 {
+    font-weight: 800;
+    font-size: 2.5rem;
+    letter-spacing: -0.5px;
+    background: linear-gradient(to right, #ffffff, #c7d2fe);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    line-height: 1.5;
+    font-weight: 300;
+}
+
+/* Glassmorphism Card Style */
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 25px;
+}
+
+label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #e2e8f0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+select {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: var(--text-main);
+    font-family: var(--font-outfit);
+    font-size: 1rem;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+select:focus {
+    border-color: #6366f1;
+}
+
+select option {
+    background: #0f172a;
+    color: var(--text-main);
+}
+
+/* Drag and Drop Zone */
+.dropzone {
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.dropzone:hover, .dropzone.dragover {
+    border-color: #6366f1;
+    background: rgba(99, 102, 241, 0.05);
+}
+
+.upload-icon {
+    width: 48px;
+    height: 48px;
+    color: #818cf8;
+    transition: transform 0.3s ease;
+}
+
+.dropzone:hover .upload-icon {
+    transform: translateY(-5px);
+}
+
+.dropzone-text {
+    font-size: 1.1rem;
+    color: #e2e8f0;
+}
+
+.dropzone-text span {
+    color: #818cf8;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.dropzone-hint {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* File Info Box */
+.file-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(99, 102, 241, 0.1);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+}
+
+.file-name {
+    font-weight: 500;
+    color: #c7d2fe;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 80%;
+}
+
+.btn-clear {
+    background: none;
+    border: none;
+    color: var(--error-color);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+/* Action Button */
+.btn-submit {
+    width: 100%;
+    padding: 16px;
+    background: var(--primary-grad);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-family: var(--font-outfit);
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-submit:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(236, 72, 153, 0.5);
+}
+
+.btn-submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Pipeline Status Card */
+.pipeline-card {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.pipeline-card h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+}
+
+.pipeline-progress-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--primary-grad);
+    border-radius: 50px;
+    transition: width 0.4s ease;
+}
+
+.progress-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* Status Badges */
+.badge {
+    padding: 3px 10px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+}
+
+.badge-pending { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; }
+.badge-processing { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
+.badge-completed { background: rgba(34, 197, 94, 0.2); color: #86efac; }
+.badge-failed { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+
+/* Console Terminal Logger */
+.console-log {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 15px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.85rem;
+}
+
+.console-header {
+    display: flex;
+    justify-content: space-between;
+    color: #64748b;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.dot-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--success-color);
+}
+
+.dot-indicator.pulsing {
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.9); opacity: 0.6; }
+    50% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(0.9); opacity: 0.6; }
+}
+
+.console-body {
+    height: 150px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    scroll-behavior: smooth;
+}
+
+.console-line {
+    line-height: 1.4;
+    word-break: break-all;
+}
+
+.console-timestamp {
+    color: #475569;
+}
+
+.text-info { color: #38bdf8; }
+.text-success { color: #4ade80; }
+.text-error { color: #f87171; }
+
+/* Download Panel Area */
+.actions-panel {
+    margin-top: 10px;
+    animation: fadeIn 0.4s ease forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.btn-download {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-radius: 12px;
+    color: white;
+    text-decoration: none;
+    font-weight: 700;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-download:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+}
+
+.download-icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* History Panel CSS */
+.history-card {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.history-card h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-height: 250px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.no-history {
+    text-align: center;
+    color: var(--text-muted);
+    font-style: italic;
+    font-size: 0.95rem;
+    padding: 20px 0;
+}
+
+.history-item {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: background-color 0.2s;
+}
+
+.history-item:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.history-item-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.history-date {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.history-item-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.history-download-link {
+    color: #38bdf8;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: rgba(56, 189, 248, 0.05);
+    transition: all 0.2s;
+}
+
+.history-download-link:hover {
+    background: rgba(56, 189, 248, 0.2);
+    border-color: #38bdf8;
+}
+
+.history-error {
+    font-size: 0.8rem;
+    color: var(--error-color);
+    background: rgba(239, 68, 68, 0.05);
+    padding: 6px 10px;
+    border-radius: 6px;
+    border-left: 3px solid var(--error-color);
+    word-break: break-all;
+}
+
+footer {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-top: 25px;
+}

@@ -14,6 +14,9 @@ from flask import Flask, request, jsonify, send_from_directory, render_template
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from werkzeug.utils import secure_filename
+import sys
+# Inject flask_app directory into sys.path to resolve imports in serverless/subfolder environments (like Vercel)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from config import Config
 from models.schemas import LanguageEnum, QuestionPair

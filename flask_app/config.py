@@ -15,8 +15,13 @@ class Config:
     OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
     OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free")
     OPENROUTER_EMBED_MODEL = os.getenv("OPENROUTER_EMBED_MODEL", "openai/text-embedding-3-small")
-    UPLOAD_FOLDER = os.path.join(os.getcwd(), "uploads")
-    OUTPUT_FOLDER = os.path.join(os.getcwd(), "outputs")
+    # Redirect writable folders to /tmp on Vercel's read-only environment
+    if os.environ.get("VERCEL"):
+        UPLOAD_FOLDER = "/tmp/uploads"
+        OUTPUT_FOLDER = "/tmp/outputs"
+    else:
+        UPLOAD_FOLDER = os.path.join(os.getcwd(), "uploads")
+        OUTPUT_FOLDER = os.path.join(os.getcwd(), "outputs")
     MAX_CONTENT_LENGTH = 50 * 1024 * 1024  # 50 MB limits
     POPPLER_PATH = os.getenv("POPPLER_PATH", None)
 

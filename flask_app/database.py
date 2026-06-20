@@ -12,7 +12,10 @@ from persist.job_persister import JobPersister
 
 logger = logging.getLogger(__name__)
 
-JOBS_DIR = os.path.join(os.path.dirname(__file__), "jobs_store")
+if os.environ.get("VERCEL"):
+    JOBS_DIR = "/tmp/jobs_store"
+else:
+    JOBS_DIR = os.path.join(os.path.dirname(__file__), "jobs_store")
 
 def init_db():
     """Initializes the jobs store directory."""
